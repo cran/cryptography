@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>cryptography</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">cryptography</h1>
+
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cryptography)</span></code></pre></div>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>cryptography provides functionality for the encryption and decryption
+of text ciphers using the Scytale, Columnar-Transposition, Autokey,
+Playfair and Four-Square methods of encryption.</p>
+</div>
+<div id="installation" class="section level1">
+<h1>Installation</h1>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To install and load the package from GitHub</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># library(devtools)</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># install_github(&quot;PiarasFahey/cryptography&quot;)</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cryptography)</span></code></pre></div>
+</div>
+<div id="scytale-cipher" class="section level1">
+<h1>Scytale cipher</h1>
+<p>The Scytale is a transpositional cipher. Typically used as a
+mechanical cipher in which a strip of paper is wrapped around a cylinder
+of fixed radius, text is written across the rows of the paper and then
+un-winded to be sent as ciphertext.</p>
+<p>This can be equated to a simple system in which plaintext is entered
+into a matrix by row and the ciphertext is read by the transpose of this
+matrix.</p>
+<p>To decrypt the ciphertext, the recipient must also possess a cylinder
+of equal radius to wrap the strip of paper around which order the
+inputted characters in correct rows.</p>
+<p>Thus the inputs to the Scytale function must consist of:</p>
+<ul>
+<li><p>A character vector of text to be encrypted or decrypted</p></li>
+<li><p>A positive integer which determines the dimensions of the Scytale
+tool by defining the number of columns</p></li>
+<li><p>A logical statement as to whether the text is to be encrypted or
+decrypted</p></li>
+</ul>
+<p>An example here gives the plaintext to be “Very super secret
+message!” (obviously something of great importance to be encrypted), a
+column length of 4 and a statement for the message to be encrypted:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scytale</span>(<span class="st">&quot;very super secret message!&quot;</span>, <span class="at">col =</span> <span class="dv">4</span>, <span class="at">encrypt =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;v eetseesrc s!ru rmaypseeg&quot;</span></span></code></pre></div>
+<p>This produces an output of “v eetseesrc s!ru rmaypseeg”. Our message
+is safely encrypted!</p>
+<p>Decrypting this outputted ciphertext with the same column length will
+produce our original plaintext:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scytale</span>(<span class="st">&quot;v eetseesrc s!ru rmaypseeg&quot;</span>, <span class="at">col =</span> <span class="dv">4</span>, <span class="at">encrypt =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;very super secret message!&quot;</span></span></code></pre></div>
+</div>
+<div id="columnar-transposition" class="section level1">
+<h1>Columnar-Transposition</h1>
+<p>The Columnar-Transposition builds on the Scytale cipher by adding an
+additional level of complexity.</p>
+<p>Rather than have the number of columns defined by an integer input,
+an alphabetic key is used to generate this value. The number of
+characters of the keyword determines the number of columns. Further to
+this the columns that the plaintext are entered into are rearranged in
+alphabetical order before being transposed.</p>
+<p>This adds an additional level of security as a potential attacker
+would need to now know the length of the word and the order of it’s
+characters.</p>
+<p>The inputs for a Columnar-Transposition function must consist of:</p>
+<ul>
+<li><p>A character vector of text to be encrypted or decrypted</p></li>
+<li><p>An alphabetic key word</p></li>
+<li><p>A logical statement as to whether the text is to be encrypted or
+decrypted</p></li>
+</ul>
+<p>An example here gives the plaintext of “Hidden message” to be
+encrypted with the keyword “hack”.</p>
+<p>This will give the same output as a Scytale cipher of length 4 but
+with the columns rearranged in the order “2, 3, 1, 4”.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">columnar_transposition</span>(<span class="st">&quot;Hidden message&quot;</span>, <span class="st">&quot;hack&quot;</span>, <span class="at">encrypt =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;insed sHeegdma&quot;</span></span></code></pre></div>
+<p>Decrypting this outputted ciphertext with the same keyword gives the
+original plaintext:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">columnar_transposition</span>(<span class="st">&quot;insed sHeegdma&quot;</span>, <span class="st">&quot;hack&quot;</span>, <span class="at">encrypt =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Hidden message&quot;</span></span></code></pre></div>
+</div>
+<div id="autokey-cipher" class="section level1">
+<h1>Autokey cipher</h1>
+<p>The Autokey cipher is a form of Vigenere substitution cipher that
+incorporates the plaintext into the key.</p>
+<p>In order to avoid repeated cycles of substitution from a fixed
+encryption key or repetition of an encryption key present in the
+Vigenere cipher, the Autokey cipher generates an encryption key by
+binding a key word and the plaintext to form an encryption key.</p>
+<p>This ensures no repeatability of substitution in the Vigenere cipher
+that would otherwise be present if the plaintext is greater in length
+than the encryption key.</p>
+<p>Thus the inputs for an Autokey cipher are the same as those for a
+Vigenere cipher:</p>
+<ul>
+<li><p>A character vector of text to be encrypted or decrypted</p></li>
+<li><p>A character vector keyword used to generate the new encryption
+key</p></li>
+<li><p>A logical statement as to whether the text is to be encrypted or
+decrypted</p></li>
+</ul>
+<p>An important note is that the autokey function is a wrapper on the
+DescTools::Vigenere function which discards any non alphanumeric
+characters. As such this function has the same limitations.</p>
+<p>An example here gives the plaintext “VerySecretMessage” with the
+keyword “Hack” to be encrypted.</p>
+<p>This will encrypt the plaintext with the Vigenere cipher with an
+encryption key “HackVerySecretMes” (A non-repeated encryption key with
+the same length as the plaintext)</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autokey</span>(<span class="st">&quot;VerySecretMessage&quot;</span>, <span class="st">&quot;Hack&quot;</span>, <span class="at">encrypt =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;c4JYn8JfwNoLMbmAM&quot;</span></span></code></pre></div>
+<p>Decrypting this outputted ciphertext with the same keyword gives the
+original plaintext:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autokey</span>(<span class="st">&quot;c4JYn8JfwNoLMbmAM&quot;</span>, <span class="st">&quot;Hack&quot;</span>, <span class="at">encrypt =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;VerySecretMessage&quot;</span></span></code></pre></div>
+<p>In this example, unsuitable characters are present but will be
+discarded with only the alphanumeric characters being encrypted:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autokey</span>(<span class="st">&quot;Very $%^&amp;SecretMes(*sag£$%e&quot;</span>, <span class="st">&quot;Hack&quot;</span>, <span class="at">encrypt =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;c4JYn8JfwNoLMbmAM&quot;</span></span></code></pre></div>
+<p>Which if decrypted will produce the plaintext of only the
+alphanumeric characters:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autokey</span>(<span class="st">&quot;c4JYn8JfwNoLMbmAM&quot;</span>, <span class="st">&quot;Hack&quot;</span>, <span class="at">encrypt =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;VerySecretMessage&quot;</span></span></code></pre></div>
+</div>
+<div id="playfair-cipher" class="section level1">
+<h1>Playfair cipher</h1>
+<p>The Playfair cipher or Playfair square is the first widely used
+digram substitution cipher.</p>
+<p>The Playfair cipher generates an alphabetic 5x5 encryption matrix
+from a keyword to act as a cipher key. The plaintext is converted to a
+series of digrams with a series of conditions (groups of 2 letters)
+which are then mapped within the encryption matrix according to 4
+possible permutations of digram element location.</p>
+<p>The inputs for the Playfair cipher are:</p>
+<ul>
+<li><p>An alphabetic character vector of text to be encrypted or
+decrypted</p></li>
+<li><p>An alphabetic keyword used to generate the encryption
+matrix</p></li>
+<li><p>A logical statement as to whether the text is to be encrypted or
+decrypted</p></li>
+</ul>
+<p>As the Playfair cipher is an alphabetic cipher, only a-zA-Z
+characters are preserved in both encryption and decryption. This will
+lead to non-symmetric results if non-alphabetic characters are present
+in the message input.</p>
+<p>Also to note is the Playfair cipher is not case sensitive and all
+outputs will be in uppercase.</p>
+<p>An example of the Playfair cipher with suitable input text of
+“SUPERSECRETMESSAGE” with the keyword “safety”:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">playfair</span>(<span class="st">&quot;SUPERSECRETMESSAGE&quot;</span>, <span class="st">&quot;safety&quot;</span>, <span class="at">encrypt =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;YSQFNTFDQTGRTAAFDT&quot;</span></span></code></pre></div>
+<p>Decrypting this outputted ciphertext will result in the original
+plaintext:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">playfair</span>(<span class="st">&quot;YSQFNTFDQTGRTAAFDT&quot;</span>, <span class="st">&quot;safety&quot;</span>, <span class="at">encrypt =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;SUPERSECRETMESSAGE&quot;</span></span></code></pre></div>
+<p>An example of unsuitable characters for input text and key with a
+message of “$%^Att&amp;(a09Ck___He86re” (AttackHere is the message of
+suitable characters) when encrypted and decrypted will produce only the
+capitalised suitable input characters:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">playfair</span>(<span class="fu">playfair</span>(<span class="st">&quot;$%^Att&amp;(a09Ck___He86re&quot;</span>, <span class="st">&quot;safety&quot;</span>), <span class="st">&quot;safety&quot;</span>, <span class="at">encrypt =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;ATTACKHERE&quot;</span></span></code></pre></div>
+</div>
+<div id="four-square-cipher" class="section level1">
+<h1>Four-Square cipher</h1>
+<p>The Four-Square cipher is a polygraphic substitution cipher.</p>
+<p>The Four-Square method generates alphabetic encryption matrices in an
+indentical method to the Playfair method as well as converting the
+plaintext to a series of digrams (without the extensive Playfair
+conditions). However two encryption matrices and two square alphabet
+matrices are used in the Four square method. Wherein each element of
+each digram is mapped within these matrices to a position in each
+corresponding encryption matrix to produce each element of
+ciphertext.</p>
+<p>Thus the inputs for the Four-Square cipher are:</p>
+<ul>
+<li><p>An alphabetic character vector of text to be encrypted or
+decrypted</p></li>
+<li><p>An alphabetic keyword used to generate the first encryption
+matrix</p></li>
+<li><p>An alphabetic keyword used to generate the second encryption
+matrix</p></li>
+<li><p>A logical statement as to whether the text is to be encrypted or
+decrypted</p></li>
+</ul>
+<p>As with the Playfair cipher, the Four-Square cipher is an alphabetic
+cipher and as such any other character inputs are discarded.</p>
+<p>An example of the Four-Square cipher with input
+“THEPRISONERSHAVEESCAPED” with the keywords “HACK”, “SAFE”:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">four_square</span>(<span class="st">&quot;THEPRISONERSHAVEESCAPED&quot;</span>, <span class="st">&quot;HACK&quot;</span>, <span class="st">&quot;SAFE&quot;</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;SHBOTDTMPFSQDFZSCUHFPBCY&quot;</span></span></code></pre></div>
+<p>Inputting this result as ciphertext to be decrypted returns the
+original message but because it is not of length 2, a filler character
+“X” is generated to facilitate the necessity for complete digrams.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">four_square</span>(<span class="st">&quot;SHBOTDTMPFSQDFZSCUHFPBCY&quot;</span>, <span class="st">&quot;HACK&quot;</span>, <span class="st">&quot;SAFE&quot;</span>, <span class="at">encrypt =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;THEPRISONERSHAVEESCAPEDX&quot;</span></span></code></pre></div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
